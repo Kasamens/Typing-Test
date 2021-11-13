@@ -22,10 +22,11 @@ def display_text(stdscr, target, current, wpm=0):
         stdscr.addstr(0, i, char, color)
 
 def wpm_test(stdscr):
-    target_text = "Some test text"
+    target_text = "The quick brown fox jumps over the lazy dog"
     current_text = []
     wpm = 0
     start_time = time.time()
+    stdscr.nodelay(True)
     
     
 
@@ -36,10 +37,17 @@ def wpm_test(stdscr):
         wpm = round((len(current_text) / (time_elapsed / 60)) / 5)
 
         stdscr.clear()
-        display_text(stdscr, target_text, current_text)
+        display_text(stdscr, target_text, current_text, wpm)
         stdscr.refresh()
 
-        key = stdscr.getkey()
+        if "".join(current_text) == target_text:
+            stdscr.nodelay(False)
+            break
+
+        try:
+            key = stdscr.getkey()
+        except:
+            continue
 
         if ord(key) == 27:
             break
@@ -62,7 +70,14 @@ def main(stdscr):
     curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
     start_screen(stdscr)
-    wpm_test(stdscr)
+
+    while True:
+        wpm_test(stdscr)
+
+        stdscr.addstr(2, 0, "You completed the test! Press any key to continue")
+        key = stdscr.getkey()
+        if ord(key) == 27:
+            break
    
 
 wrapper(main)
